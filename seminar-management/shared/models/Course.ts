@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../lib/config/db';
+import Trainer from './Trainer';
 
 const Course = sequelize.define('Course', {
   id: {
@@ -14,7 +15,13 @@ const Course = sequelize.define('Course', {
   notes: { type: DataTypes.TEXT, allowNull: true },
   participants: { type: DataTypes.INTEGER, allowNull: false, validate: { min: 1 } },
   price: { type: DataTypes.FLOAT, allowNull: false, validate: { min: 0 } },
-  trainer_price: { type: DataTypes.FLOAT, allowNull: false, validate: { min: 0 } }
+  trainerId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Trainer,
+      key: 'id'
+    },
+  },
 });
 
 console.log(Course === sequelize.models.Course);

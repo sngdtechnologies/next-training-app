@@ -8,8 +8,9 @@ const Trainer = sequelize.define('Trainer', {
     primaryKey: true,
   },
   name: { type: DataTypes.STRING, allowNull: false },
-  training_subjects: { type: DataTypes.JSON, allowNull: false },
+  subjects: { type: DataTypes.JSON, allowNull: false },
   location: { type: DataTypes.STRING, allowNull: false },
+  price: { type: DataTypes.FLOAT, allowNull: false, validate: { min: 0 } },
   email: { type: DataTypes.STRING, allowNull: false, unique: true, validate: { isEmail: true } },
 });
 
