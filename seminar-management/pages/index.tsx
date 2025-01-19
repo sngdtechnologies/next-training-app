@@ -1,6 +1,8 @@
+import { signOut, useSession } from "next-auth/react";
 import Header from "../components/Header";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { IUser } from "@/shared/types/user.type";
 
 export default function Home() {
   const [stats] = useState({
@@ -10,16 +12,25 @@ export default function Home() {
     completedCourses: 2,
   });
 
-  const user = "John Doe"; // Replace with actual user logic
+  const [user, setUser] = useState<IUser>();
+  const { data: session } = useSession();
 
-  const handleSignOut = () => {
+  useEffect(() => {
+    if (session && session.user) {
+      const u: any = session.user;
+      setUser(u.dataValues as IUser);
+    }
+  }, [session]);
+
+  const handleSignOut = async () => {
     // Add sign-out logic here
     console.log("User signed out");
+    await signOut();
   };
 
   return (
     <div>
-      <Header user={user} onSignOut={handleSignOut} />
+      <Header user={user?.username} onSignOut={handleSignOut} />
       <main className="container mx-auto p-6">
         <h1 className="text-4xl font-bold mb-8">Dashboard</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

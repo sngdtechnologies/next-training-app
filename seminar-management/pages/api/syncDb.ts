@@ -1,8 +1,10 @@
 import { sequelize } from "@/shared/lib/config/db";
 import { errorHandler } from "@/shared/lib/utils/errorHandler";
 import { Course, Trainer } from "@/shared/models";
+import User from "@/shared/models/User";
 import { ITrainer } from "@/shared/types/trainer.type";
 import type { NextApiRequest, NextApiResponse } from 'next'
+import bcrypt from "bcrypt";
 
 export default async function handler(
     req: NextApiRequest,
@@ -32,6 +34,14 @@ export default async function handler(
             notes: "Introduction to React.js",
             price: 250,
             trainerId: trainer.id,
+        });
+
+        const hashedPassword = await bcrypt.hash("john123", Number(process.env.SALT_ROUNDS));
+        await User.create({
+            name: 'John Doe',
+            email: 'john@gmail.com',
+            username: 'john.doe',
+            password: hashedPassword
         });
 
         return res.status(200).json({ message: "Database synced successfully!", trainer, subjects: trainer.subjects[0], type: typeof trainer.subjects });
