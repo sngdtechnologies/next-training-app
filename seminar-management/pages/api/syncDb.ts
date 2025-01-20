@@ -36,15 +36,23 @@ export default async function handler(
             trainerId: trainer.id,
         });
 
+        const trainer2 = await Trainer.create({
+            name: "John Smith",
+            trainingSubjects: ["Node.js", "React.js"],
+            location: "Stuttgart",
+            email: "john.smith@example.com",
+            price: 500
+        }) as unknown as ITrainer;
+
         await Course.create({
             name: "React.js Fundamentals",
             date: "2024-10-15",
-            subject: "React.js",
+            subject: "Node.js",
             location: "Stuttgart",
             participants: 15,
             notes: "Introduction to React.js",
             price: 250,
-            trainerId: trainer.id,
+            trainerId: trainer2.id,
         });
 
         await Course.create({

@@ -3,31 +3,20 @@ import Header from "../components/Header";
 import { ICourse } from "@/shared/types/course.type";
 import { formatDate } from "@/shared/lib/utils/date";
 
-const sampleTrainers = [
-  {
-    id: 1,
-    name: "Jane Doe",
-    trainingSubjects: ["React.js"],
-    location: "Stuttgart",
-    email: "jane.doe@example.com",
-  },
-  {
-    id: 2,
-    name: "John Smith",
-    trainingSubjects: ["Node.js"],
-    location: "Stuttgart",
-    email: "john.smith@example.com",
-  },
-];
-
 export default function Courses() {
   const [courseList, setCourseList] = useState<ICourse[]>([]);
+  const [trainerList, setTrainerList] = useState<ICourse[]>([]);
   
   useEffect(() => {
     async function fetchData() {
       await fetch('/api/courses').then(async (e) => {
         const data = await e.json();
         setCourseList(data);
+      });
+
+      await fetch('/api/trainers').then(async (e) => {
+        const data = await e.json();
+        setTrainerList(data);
       });
     }
     fetchData();
@@ -84,7 +73,7 @@ export default function Courses() {
                     <div className="flex items-center space-x-2">
                       <select className="border border-gray-300 px-4 py-2 rounded-lg shadow-md">
                         <option value="">Select Trainer</option>
-                        {sampleTrainers.map((trainer) => (
+                        {trainerList.map((trainer) => (
                           <option key={trainer.id} value={trainer.id}>
                             {trainer.name}
                           </option>
