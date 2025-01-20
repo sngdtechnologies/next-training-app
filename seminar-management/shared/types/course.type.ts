@@ -10,5 +10,5 @@ export interface ICourse {
     notes: string,
     participants: number,
     price: number,
-    trainerId?: ITrainer
+    trainer?: ITrainer | null
 }

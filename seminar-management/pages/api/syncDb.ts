@@ -21,7 +21,7 @@ export default async function handler(
             name: 'John Doe',
             email: 'john.doe@example.com',
             location: 'Berlin',
-            subjects: ["React.js"],
+            trainingSubjects: ["React.js"],
             price: 500
         }) as unknown as ITrainer;
 
@@ -36,6 +36,28 @@ export default async function handler(
             trainerId: trainer.id,
         });
 
+        await Course.create({
+            name: "React.js Fundamentals",
+            date: "2024-10-15",
+            subject: "React.js",
+            location: "Stuttgart",
+            participants: 15,
+            notes: "Introduction to React.js",
+            price: 250,
+            trainerId: trainer.id,
+        });
+
+        await Course.create({
+            name: "React.js Fundamentals",
+            date: "2024-10-15",
+            subject: "React.js",
+            location: "Stuttgart",
+            participants: 15,
+            notes: "Introduction to React.js",
+            price: 250,
+            trainerId: null,
+        });
+
         const hashedPassword = await bcrypt.hash("john123", Number(process.env.SALT_ROUNDS));
         await User.create({
             name: 'John Doe',
@@ -44,7 +66,7 @@ export default async function handler(
             password: hashedPassword
         });
 
-        return res.status(200).json({ message: "Database synced successfully!", trainer, subjects: trainer.subjects[0], type: typeof trainer.subjects });
+        return res.status(200).json({ message: "Database synced successfully!", trainer, subjects: trainer.trainingSubjects[0], type: typeof trainer.trainingSubjects });
     } catch (error) {
         console.error(error);
         return errorHandler(res, "Database sync failed", 500);

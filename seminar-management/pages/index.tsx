@@ -3,6 +3,8 @@ import Header from "../components/Header";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { IUser } from "@/shared/types/user.type";
+import { ICourse } from "@/shared/types/course.type";
+import { formatDate } from "@/shared/lib/utils/date";
 
 export default function Home() {
   const [stats] = useState({
@@ -12,8 +14,19 @@ export default function Home() {
     completedCourses: 2,
   });
 
+  const [courseList, setCourseList] = useState<ICourse[]>([]);
   const [user, setUser] = useState<IUser>();
   const { data: session } = useSession();
+
+  useEffect(() => {
+    async function fetchData() {
+      await fetch('/api/courses').then(async (e) => {
+        const data = await e.json();
+        setCourseList(data);
+      });
+    }
+    fetchData();
+  }, []);
 
   useEffect(() => {
     if (session && session.user) {
@@ -73,6 +86,41 @@ export default function Home() {
             View Trainers
           </Link>
         </div>
+        <h1 className="text-4xl font-bold my-4">Course List</h1>
+        <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
+          <thead className="bg-gray-800 text-white">
+            <tr>
+              <th className="py-3 px-4 border-b">Course Name</th>
+              <th className="py-3 px-4 border-b">Date</th>
+              <th className="py-3 px-4 border-b">Subject</th>
+              <th className="py-3 px-4 border-b">Location</th>
+              <th className="py-3 px-4 border-b">Trainer</th>
+            </tr>
+          </thead>
+          <tbody>
+            {courseList.map((course) => (
+              <tr key={course.id}>
+                <td className="py-3 px-4 border-b">{course.name}</td>
+                <td className="py-3 px-4 border-b">{formatDate(course.date)}</td>
+                <td className="py-3 px-4 border-b">{course.subject}</td>
+                <td className="py-3 px-4 border-b">{course.location}</td>
+                <td className="py-3 px-4 border-b">
+                  {course.trainer ? (
+                    <div>
+                      <div>
+                        <strong>{course.trainer.name}</strong>
+                      </div>
+                      <div>{course.trainer.trainingSubjects.join(", ")}</div>
+                      <div>{course.trainer.email}</div>
+                    </div>
+                  ) : (
+                    <span>No trainer assigned</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </main>
     </div>
   );

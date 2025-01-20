@@ -17,6 +17,7 @@ const Course = sequelize.define('Course', {
   price: { type: DataTypes.FLOAT, allowNull: false, validate: { min: 0 } },
   trainerId: {
     type: DataTypes.INTEGER,
+    allowNull: true,
     references: {
       model: Trainer,
       key: 'id'

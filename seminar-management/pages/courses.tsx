@@ -1,34 +1,7 @@
+import { useEffect, useState } from "react";
 import Header from "../components/Header";
-
-const sampleCourses = [
-  {
-    id: 1,
-    name: "React.js Fundamentals",
-    date: "2024-10-15",
-    subject: "React.js",
-    location: "Stuttgart",
-    participants: 15,
-    notes: "Introduction to React.js",
-    price: 250,
-    trainer: {
-      name: "Jane Doe",
-      trainingSubjects: ["React.js"],
-      location: "Stuttgart",
-      email: "jane.doe@example.com",
-    },
-  },
-  {
-    id: 2,
-    name: "Node.js Basics",
-    date: "2024-10-22",
-    subject: "Node.js",
-    location: "Stuttgart",
-    participants: 10,
-    notes: "Introduction to Node.js",
-    price: 200,
-    trainer: null,
-  },
-];
+import { ICourse } from "@/shared/types/course.type";
+import { formatDate } from "@/shared/lib/utils/date";
 
 const sampleTrainers = [
   {
@@ -48,6 +21,18 @@ const sampleTrainers = [
 ];
 
 export default function Courses() {
+  const [courseList, setCourseList] = useState<ICourse[]>([]);
+  
+  useEffect(() => {
+    async function fetchData() {
+      await fetch('/api/courses').then(async (e) => {
+        const data = await e.json();
+        setCourseList(data);
+      });
+    }
+    fetchData();
+  }, []);
+
   return (
     <div>
       <Header user="John Doe" onSignOut={() => {}} />
@@ -65,10 +50,10 @@ export default function Courses() {
             </tr>
           </thead>
           <tbody>
-            {sampleCourses.map((course) => (
+            {courseList.map((course) => (
               <tr key={course.id}>
                 <td className="py-3 px-4 border-b">{course.name}</td>
-                <td className="py-3 px-4 border-b">{course.date}</td>
+                <td className="py-3 px-4 border-b">{formatDate(course.date)}</td>
                 <td className="py-3 px-4 border-b">{course.subject}</td>
                 <td className="py-3 px-4 border-b">{course.location}</td>
                 <td className="py-3 px-4 border-b">
