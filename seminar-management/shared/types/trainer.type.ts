@@ -1,5 +1,5 @@
 export interface ITrainer {
-    id: number,
+    id?: number,
     name: string,
     trainingSubjects: any[],
     location: string,

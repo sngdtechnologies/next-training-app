@@ -5,14 +5,18 @@ import { formatDate } from "@/shared/lib/utils/date";
 import { useRouter } from "next/router";
 import CourseForm from "@/components/forms/course";
 import { whichNewType } from "@/shared/types";
+import TrainerForm from "@/components/forms/trainer";
+import { ITrainer } from "@/shared/types/trainer.type";
 
 export default function Courses() {
   const router = useRouter();
 
+  const [success, setSuccesss] = useState<String | undefined>();
+  const [errors, setErrors] = useState<String | undefined>();
   const [courseList, setCourseList] = useState<ICourse[]>([]);
-  const [trainerList, setTrainerList] = useState<ICourse[]>([]);
+  const [trainerList, setTrainerList] = useState<ITrainer[]>([]);
   const [whichNew, setWhichNew] = useState<whichNewType>();
-  
+
   useEffect(() => {
     async function fetchData() {
       await getCourses();
@@ -37,10 +41,20 @@ export default function Courses() {
 
   return (
     <div>
-      <Header user="John Doe" onSignOut={() => {}} />
+      <Header user="John Doe" onSignOut={() => { }} />
       <main className="container mx-auto p-6">
         <h1 className="text-4xl font-bold mb-8">Courses</h1>
         <div className="card mb-3">
+          {success && (
+            <div className="p-4 mb-2 text-lg font-semibold text-white bg-green-500 rounded-md w-full">
+              {success && <div className="text-sm">{success}</div>}
+            </div>
+          )}
+          {errors && (
+            <div className="p-4 mb-2 text-lg font-semibold text-white bg-red-500 rounded-md w-full">
+              {errors && <div className="text-sm">{errors}</div>}
+            </div>
+          )}
           <div className="flex flex-1 justify-end my-3">
             <div className="flex space-x-4">
               <button onClick={() => setWhichNew("course")} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
@@ -51,7 +65,8 @@ export default function Courses() {
               </button>
             </div>
           </div>
-          {whichNew === "course" ? <CourseForm setCourseList={setCourseList} setWhichNew={setWhichNew} /> : ""}
+          {whichNew === "course" ? <CourseForm setCourseList={setCourseList} setWhichNew={setWhichNew} setErrors={setErrors} setSuccesss={setSuccesss} /> : ""}
+          {whichNew === "trainer" ? <TrainerForm setTrainerList={setTrainerList} setWhichNew={setWhichNew} setErrors={setErrors} setSuccesss={setSuccesss} /> : ""}
         </div>
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
           <thead className="bg-gray-800 text-white">

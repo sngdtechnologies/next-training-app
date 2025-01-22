@@ -1,52 +1,43 @@
-import { formatDateToBackend } from "@/shared/lib/utils/date";
 import { useFormStatus } from "@/shared/lib/utils/form";
 import { wait } from "@/shared/lib/utils/utils";
-import { CourseFormProps } from "@/shared/types";
-import { ICourse } from "@/shared/types/course.type";
+import { TrainerFormProps } from "@/shared/types";
+import { ITrainer } from "@/shared/types/trainer.type";
 import dayjs from "dayjs";
 import { useState } from "react";
 
 const defaultData = {
-  name: "",
-  date: dayjs(),
-  subject: "",
-  location: "",
-  notes: "",
-  participants: 0,
-  price: 0,
-  trainer: null
+    name: "",
+    trainingSubjects: [],
+    location: "",
+    price: 0,
+    email: ""
 };
 
-const CourseForm = ({ setCourseList, setWhichNew, setSuccesss, setErrors }: CourseFormProps ) => {
-    const [data, setData] = useState<ICourse>(defaultData);
+const TrainerForm = ({ setTrainerList, setWhichNew, setSuccesss, setErrors }: TrainerFormProps) => {
+    const [data, setData] = useState<ITrainer>(defaultData);
     const { status, startPending, setSuccess, setError, resetStatus } = useFormStatus();
-    
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         startPending();
 
         try {
-            const datab = {
-                ...data,
-                date: formatDateToBackend(data.date)
-            };
-
-            await fetch("/api/courses", {
+            await fetch("/api/trainers", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(datab)
+                body: JSON.stringify(data)
             }).then(async (e) => {
                 if (e.ok) {
                     wait(2000);
                     setSuccess();
-                    setSuccesss("Course is created successfully");
+                    setSuccesss("Trainer is created successfully");
                     setData(defaultData);
                     setWhichNew(undefined);
-                    await fetch('/api/courses').then(async (e) => {
+                    await fetch('/api/trainers').then(async (e) => {
                         const data = await e.json();
-                        setCourseList(data);
+                        setTrainerList(data);
                     });
                 } else {
                     setErrors("Expected erreor");
@@ -60,6 +51,17 @@ const CourseForm = ({ setCourseList, setWhichNew, setSuccesss, setErrors }: Cour
         wait(5000)
         resetStatus();
     };
+
+    const onTrainingSubjectsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const options = e.target.options;
+        const selectedValues = [];
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].selected) {
+                selectedValues.push(options[i].value);
+            }
+        }
+        setData({ ...data, trainingSubjects: selectedValues });
+    }
 
     return (
         <form className="space-y-6" onSubmit={handleSubmit}>
@@ -78,24 +80,7 @@ const CourseForm = ({ setCourseList, setWhichNew, setSuccesss, setErrors }: Cour
                         value={data.name}
                         onChange={(e) => setData({ ...data, name: e.target.value })}
                         className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                        placeholder="Enter name of course"
-                    />
-                </div>
-                <div>
-                    <label
-                        htmlFor="subject"
-                        className="block text-gray-700 text-sm font-medium mb-2"
-                    >
-                        Subject:
-                    </label>
-                    <input
-                        id="subject"
-                        type="text"
-                        name="subject"
-                        value={data.subject}
-                        onChange={(e) => setData({ ...data, subject: e.target.value })}
-                        className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                        placeholder="Enter subject of course"
+                        placeholder="Enter name of trainer"
                     />
                 </div>
                 <div>
@@ -112,41 +97,7 @@ const CourseForm = ({ setCourseList, setWhichNew, setSuccesss, setErrors }: Cour
                         value={data.price}
                         onChange={(e) => setData({ ...data, price: Number(e.target.value) })}
                         className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                        placeholder="Enter price of course"
-                    />
-                </div>
-                <div>
-                    <label
-                        htmlFor="date"
-                        className="block text-gray-700 text-sm font-medium mb-2"
-                    >
-                        Date:
-                    </label>
-                    <input
-                        id="date"
-                        type="date"
-                        name="date"
-                        value={data.date ? data.date.format('YYYY-MM-DD') : ''}
-                        onChange={(e) => setData({ ...data, date: dayjs(e.target.value) })}
-                        className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                        placeholder="Enter published date"
-                    />
-                </div>
-                <div>
-                    <label
-                        htmlFor="notes"
-                        className="block text-gray-700 text-sm font-medium mb-2"
-                    >
-                        Notes:
-                    </label>
-                    <input
-                        id="notes"
-                        type="text"
-                        name="notes"
-                        value={data.notes}
-                        onChange={(e) => setData({ ...data, notes: e.target.value })}
-                        className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                        placeholder="Enter notes of course"
+                        placeholder="Enter price of trainer"
                     />
                 </div>
                 <div>
@@ -163,25 +114,45 @@ const CourseForm = ({ setCourseList, setWhichNew, setSuccesss, setErrors }: Cour
                         value={data.location}
                         onChange={(e) => setData({ ...data, location: e.target.value })}
                         className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                        placeholder="Enter location of course"
+                        placeholder="Enter location of trainer"
                     />
                 </div>
                 <div>
                     <label
-                        htmlFor="participants"
+                        htmlFor="email"
                         className="block text-gray-700 text-sm font-medium mb-2"
                     >
-                        Participants:
+                        Email:
                     </label>
                     <input
-                        id="participants"
-                        type="number"
-                        name="participants"
-                        value={data.participants}
-                        onChange={(e) => setData({ ...data, participants: Number(e.target.value) })}
+                        id="email"
+                        type="email"
+                        name="email"
+                        value={data.email}
+                        onChange={(e) => setData({ ...data, email: e.target.value })}
                         className="border border-gray-300 rounded-lg p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                        placeholder="Enter participants of course"
+                        placeholder="Enter email of trainer"
                     />
+                </div>
+                <div>
+                    <label
+                        htmlFor="trainingSubjects"
+                        className="block text-gray-700 text-sm font-medium mb-2"
+                    >
+                        Training subjects:
+                    </label>
+                    <select
+                        id="trainingSubjects"
+                        name="trainingSubjects"
+                        multiple
+                        value={data.trainingSubjects}
+                        onChange={onTrainingSubjectsChange}
+                        className="px-4 py-2 rounded-lg shadow-md"
+                    >
+                        <option value="React.js">React.js</option>
+                        <option value="Next.js">Next.js</option>
+                        <option value="Vue js">Vue js</option>
+                    </select>
                 </div>
             </div>
             <div className="flex flex-2 justify-start my-3 space-x-4">
@@ -196,4 +167,4 @@ const CourseForm = ({ setCourseList, setWhichNew, setSuccesss, setErrors }: Cour
     );
 };
 
-export default CourseForm;
+export default TrainerForm;

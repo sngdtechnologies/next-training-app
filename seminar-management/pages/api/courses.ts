@@ -23,7 +23,6 @@ export default async function handler(
         case "POST":
             try {
                 const data: ICourse = await req.body;
-                console.log("data", data);
                 const course = await Course.create({ ...data, trainerId: data.trainer?.id });
                 
                 res.status(201).json(formatCourse(course));
