@@ -7,11 +7,14 @@ const getDate = (date: any) => (date && dayjs(date).isValid() ? dayjs(date).toDa
 
 const formatDate = (date: any) => (date && dayjs(date).isValid() ? dayjs(date).format('DD/MM/YYYY') : null);
 
+const formatDateToBackend = (date: any) => (date && dayjs(date).isValid() ? dayjs(date).format('YYYY-MM-DD') : null);
+
 const formatTime = (date: any) => (date && dayjs(date).isValid() ? dayjs(date).format('HH:mm:ss') : null);
 
 export {
     getDate,
     displayDefaultDateTime,
     formatDate,
-    formatTime
+    formatTime,
+    formatDateToBackend
 }

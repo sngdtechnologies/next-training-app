@@ -18,3 +18,19 @@ export const formatCourses = (courses: ICourse[]) => {
         } : null
     }));
 }
+
+export const formatCourse = (course: any) => {
+    return {
+        id: course.id,
+        name: course.name,
+        date: course.date,
+        subject: course.subject,
+        location: course.location,
+        participants: course.participants,
+        notes: course.notes,
+        price: course.price,
+        trainer: course.trainerId != null ? {
+            id: course.trainerId
+        } : null
+    };
+}

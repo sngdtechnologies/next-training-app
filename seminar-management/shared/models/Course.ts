@@ -13,7 +13,7 @@ const Course = sequelize.define('Course', {
   subject: { type: DataTypes.STRING, allowNull: false },
   location: { type: DataTypes.STRING, allowNull: false },
   notes: { type: DataTypes.TEXT, allowNull: true },
-  participants: { type: DataTypes.INTEGER, allowNull: false, validate: { min: 1 } },
+  participants: { type: DataTypes.INTEGER, allowNull: false, validate: { min: 0 } },
   price: { type: DataTypes.FLOAT, allowNull: false, validate: { min: 0 } },
   trainerId: {
     type: DataTypes.INTEGER,
