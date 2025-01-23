@@ -1,4 +1,5 @@
 import { ICourse } from "@/shared/types/course.type";
+import { Trainer } from '@/shared/models';
 
 export const formatCourses = (courses: ICourse[]) => {
     return courses.map((course: any) => ({
@@ -11,6 +12,7 @@ export const formatCourses = (courses: ICourse[]) => {
         notes: course.notes,
         price: course.price,
         trainer: course.Trainer != null ? {
+            id: course.Trainer.id,
             name: course.Trainer.name,
             trainingSubjects: course.Trainer.trainingSubjects,
             location: course.Trainer.location,
