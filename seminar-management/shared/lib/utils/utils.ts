@@ -22,7 +22,7 @@ export const suggestQualifiedTrainer = (trainers: ITrainer[], course: any): ITra
     });
 }
 
-export const checkIfTrainerIsAvalaible = (courses: ICourse[], trainerId: number, date: string): boolean => {
+export const checkIfTrainerIsAvalaible = (courses: ICourse[], trainerId: number | undefined, date: string | null): boolean => {
     return courses.find((e) => {
         return formatDateToBackend(e.date) === date && e.trainer?.id === trainerId;
     }) != undefined;

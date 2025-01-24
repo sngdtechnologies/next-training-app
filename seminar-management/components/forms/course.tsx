@@ -1,6 +1,6 @@
 import { formatDateToBackend } from "@/shared/lib/utils/date";
 import { useFormStatus } from "@/shared/lib/utils/form";
-import { wait } from "@/shared/lib/utils/utils";
+import { checkIfAnotherCourseHaveSameDateAndLocation, wait } from "@/shared/lib/utils/utils";
 import { CourseFormProps } from "@/shared/types";
 import { ICourse } from "@/shared/types/course.type";
 import dayjs from "dayjs";
@@ -17,7 +17,7 @@ const defaultData = {
   trainer: null
 };
 
-const CourseForm = ({ setCourseList, setWhichNew, setSuccesss, setErrors }: CourseFormProps ) => {
+const CourseForm = ({ courseList, setCourseList, setWhichNew, setSuccesss, setErrors }: CourseFormProps ) => {
     const [data, setData] = useState<ICourse>(defaultData);
     const { status, startPending, setSuccess, setError, resetStatus } = useFormStatus();
     
@@ -26,6 +26,16 @@ const CourseForm = ({ setCourseList, setWhichNew, setSuccesss, setErrors }: Cour
         startPending();
 
         try {
+            if (checkIfAnotherCourseHaveSameDateAndLocation(courseList, data)) {
+                setErrors("Another course is already scheduled at the same date and location");
+                return null;
+            }
+
+            if (data.price < 0) {
+                setErrors("Price cannot be negative");
+                return null;
+            }
+
             const datab = {
                 ...data,
                 date: formatDateToBackend(data.date)

@@ -65,7 +65,7 @@ export default function Courses() {
               </button>
             </div>
           </div>
-          {whichNew === "course" ? <CourseForm setCourseList={setCourseList} setWhichNew={setWhichNew} setErrors={setErrors} setSuccesss={setSuccesss} /> : ""}
+          {whichNew === "course" ? <CourseForm courseList={courseList} setCourseList={setCourseList} setWhichNew={setWhichNew} setErrors={setErrors} setSuccesss={setSuccesss} /> : ""}
           {whichNew === "trainer" ? <TrainerForm setTrainerList={setTrainerList} setWhichNew={setWhichNew} setErrors={setErrors} setSuccesss={setSuccesss} /> : ""}
         </div>
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
