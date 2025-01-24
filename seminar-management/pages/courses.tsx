@@ -8,6 +8,8 @@ import { whichNewType } from "@/shared/types";
 import TrainerForm from "@/components/forms/trainer";
 import { ITrainer } from "@/shared/types/trainer.type";
 import { checkIfTrainerIsAvalaible, suggestQualifiedTrainer, wait } from "@/shared/lib/utils/utils";
+import { signOut, useSession } from "next-auth/react";
+import { IUser } from "@/shared/types/user.type";
 
 export default function Courses() {
   const router = useRouter();
@@ -19,6 +21,8 @@ export default function Courses() {
   const [whichNew, setWhichNew] = useState<whichNewType>();
   const [courseSelected, setCourseSelected] = useState<ICourse>();
   const [trainerSelected, setTrainerSelected] = useState<ITrainer>();
+  const [user, setUser] = useState<IUser>();
+  const { data: session } = useSession();
 
   useEffect(() => {
     async function fetchData() {
@@ -27,6 +31,13 @@ export default function Courses() {
     }
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (session && session.user) {
+      const u: any = session.user;
+      setUser(u.dataValues as IUser);
+    }
+  }, [session]);
 
   const getCourses = async () => {
     await fetch('/api/courses').then(async (e) => {
@@ -63,8 +74,16 @@ export default function Courses() {
   const asignTrainer = async () => {
     const data = { courseId: courseSelected?.id, trainerId: trainerSelected?.id };
 
+    const waiting = () => {
+      wait(5000).then(() => {
+        setErrors(undefined);
+        setSuccesss(undefined);
+      });
+    }
+
     if (courseSelected && trainerSelected && checkIfTrainerIsAvalaible(courseList, Number(trainerSelected.id), courseSelected.date)) {
       setErrors("Trainer is not available for the selected course date.");
+      waiting();
     }
 
     await fetch('/api/trainers/asign', {
@@ -101,9 +120,15 @@ export default function Courses() {
     }));
   }
 
+  const handleSignOut = async () => {
+    // Add sign-out logic here
+    console.log("User signed out");
+    await signOut();
+  };
+  
   return (
     <div>
-      <Header user="John Doe" onSignOut={() => { }} />
+      <Header user={user?.username} onSignOut={handleSignOut} />
       <main className="container mx-auto p-6">
         <h1 className="text-4xl font-bold mb-8">Courses</h1>
         <div className="card mb-3">
@@ -122,13 +147,13 @@ export default function Courses() {
               <button onClick={() => setWhichNew("course")} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
                 New Course
               </button>
-              <button onClick={() => setWhichNew("trainer")} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
+              {/* <button onClick={() => setWhichNew("trainer")} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
                 New Trainer
-              </button>
+              </button> */}
             </div>
           </div>
           {whichNew === "course" ? <CourseForm courseList={courseList} setCourseList={setCourseList} setWhichNew={setWhichNew} setErrors={setErrors} setSuccesss={setSuccesss} /> : ""}
-          {whichNew === "trainer" ? <TrainerForm setTrainerList={setTrainerList} setWhichNew={setWhichNew} setErrors={setErrors} setSuccesss={setSuccesss} /> : ""}
+          {/* {whichNew === "trainer" ? <TrainerForm setTrainerList={setTrainerList} setWhichNew={setWhichNew} setErrors={setErrors} setSuccesss={setSuccesss} /> : ""} */}
         </div>
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
           <thead className="bg-gray-800 text-white">

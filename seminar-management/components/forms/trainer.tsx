@@ -43,6 +43,11 @@ const TrainerForm = ({ setTrainerList, setWhichNew, setSuccesss, setErrors }: Tr
                     setErrors("Expected erreor");
                 }
             });
+
+            wait(5000).then(() => {
+                setErrors(undefined);
+                setSuccesss(undefined);
+            });
         } catch (error) {
             setError();
             setErrors("Expected erreor");

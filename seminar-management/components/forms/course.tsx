@@ -21,6 +21,13 @@ const CourseForm = ({ courseList, setCourseList, setWhichNew, setSuccesss, setEr
     const [data, setData] = useState<ICourse>(defaultData);
     const { status, startPending, setSuccess, setError, resetStatus } = useFormStatus();
     
+    const waiting = () => {
+        wait(5000).then(() => {
+            setErrors(undefined);
+            setSuccesss(undefined);
+        });
+    }
+    
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         startPending();
@@ -28,11 +35,13 @@ const CourseForm = ({ courseList, setCourseList, setWhichNew, setSuccesss, setEr
         try {
             if (checkIfAnotherCourseHaveSameDateAndLocation(courseList, data)) {
                 setErrors("Another course is already scheduled at the same date and location");
+                waiting();
                 return null;
             }
 
             if (data.price < 0) {
                 setErrors("Price cannot be negative");
+                waiting();
                 return null;
             }
 
@@ -61,11 +70,11 @@ const CourseForm = ({ courseList, setCourseList, setWhichNew, setSuccesss, setEr
                 } else {
                     setErrors("Expected erreor");
                 }
-            }).finally(async () => {
-                await wait(500).then(() => {
-                    setErrors(undefined);
-                    setSuccesss(undefined);
-                });
+            })
+
+            wait(5000).then(() => {
+                setErrors(undefined);
+                setSuccesss(undefined);
             });
         } catch (error) {
             setError();
