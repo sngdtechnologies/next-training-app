@@ -6,7 +6,7 @@ export const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve,
 
 export const checkIfAnotherCourseHaveSameDateAndLocation = (courseList: ICourse[], course: any): ICourse | undefined => {
     return courseList.find((c) => {
-        return c.date === course.date && c.location === course.location;
+        return formatDateToBackend(c.date) === formatDateToBackend(course.date) && c.location === course.location;
     });
 }
 
