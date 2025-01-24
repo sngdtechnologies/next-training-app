@@ -61,6 +61,11 @@ const CourseForm = ({ courseList, setCourseList, setWhichNew, setSuccesss, setEr
                 } else {
                     setErrors("Expected erreor");
                 }
+            }).finally(async () => {
+                await wait(500).then(() => {
+                    setErrors(undefined);
+                    setSuccesss(undefined);
+                });
             });
         } catch (error) {
             setError();

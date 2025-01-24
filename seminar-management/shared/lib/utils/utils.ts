@@ -1,6 +1,7 @@
 import { ICourse } from "@/shared/types/course.type";
 import { ITrainer } from "@/shared/types/trainer.type";
 import { formatDateToBackend } from "./date";
+import dayjs from "dayjs";
 
 export const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -22,8 +23,8 @@ export const suggestQualifiedTrainer = (trainers: ITrainer[], course: any): ITra
     });
 }
 
-export const checkIfTrainerIsAvalaible = (courses: ICourse[], trainerId: number | undefined, date: string | null): boolean => {
+export const checkIfTrainerIsAvalaible = (courses: ICourse[], trainerId: number | undefined, date: dayjs.Dayjs | null): boolean => {
     return courses.find((e) => {
-        return formatDateToBackend(e.date) === date && e.trainer?.id === trainerId;
+        return formatDateToBackend(e.date) === formatDateToBackend(date) && e.trainer?.id === trainerId;
     }) != undefined;
 }

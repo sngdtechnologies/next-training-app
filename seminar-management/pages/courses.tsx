@@ -7,6 +7,7 @@ import CourseForm from "@/components/forms/course";
 import { whichNewType } from "@/shared/types";
 import TrainerForm from "@/components/forms/trainer";
 import { ITrainer } from "@/shared/types/trainer.type";
+import { checkIfTrainerIsAvalaible, suggestQualifiedTrainer, wait } from "@/shared/lib/utils/utils";
 
 export default function Courses() {
   const router = useRouter();
@@ -16,6 +17,8 @@ export default function Courses() {
   const [courseList, setCourseList] = useState<ICourse[]>([]);
   const [trainerList, setTrainerList] = useState<ITrainer[]>([]);
   const [whichNew, setWhichNew] = useState<whichNewType>();
+  const [courseSelected, setCourseSelected] = useState<ICourse>();
+  const [trainerSelected, setTrainerSelected] = useState<ITrainer>();
 
   useEffect(() => {
     async function fetchData() {
@@ -37,6 +40,65 @@ export default function Courses() {
       const data = await e.json();
       setTrainerList(data);
     });
+  }
+
+  const onChangeTrainer = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const [courseId, trainerId] = e.target.value.split("-");
+  
+    const course = courseList.find((e: ICourse) => e.id == Number(courseId));
+    if (course && checkIfTrainerIsAvalaible(courseList, Number(trainerId), course.date)) {
+      setErrors("Trainer is not available for the selected course date.");
+    }
+
+    const trainer = trainerList.find((e: ITrainer) => e.id == Number(trainerId));
+    setTrainerSelected(trainer);
+    setCourseSelected(course);
+
+    wait(5000).then(() => {
+      setErrors(undefined);
+      setSuccesss(undefined);
+    });
+  };
+
+  const asignTrainer = async () => {
+    const data = { courseId: courseSelected?.id, trainerId: trainerSelected?.id };
+
+    if (courseSelected && trainerSelected && checkIfTrainerIsAvalaible(courseList, Number(trainerSelected.id), courseSelected.date)) {
+      setErrors("Trainer is not available for the selected course date.");
+    }
+
+    await fetch('/api/trainers/asign', {
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }).then(async (e) => {
+      if (e.ok) {
+        setSuccesss("Trainer assigned successfully.");
+      } else {
+        setErrors("Failed to assign trainer.");
+      }
+    });
+
+    getCourses();
+
+    wait(5000).then(() => {
+      setErrors(undefined);
+      setSuccesss(undefined);
+    });
+  }
+
+  const formatTrainer = (list: ITrainer[], course: any) => {
+    const newList = suggestQualifiedTrainer(list, { location: course.location, subject: course.subject });
+    
+    return newList.map((e) => ({
+      id: e.id,
+      name: `${e.name} - ${e.location} - ${e.trainingSubjects.join(',')}`,
+      trainingSubjects: e.trainingSubjects,
+      price: e.price,
+      email: e.email
+    }));
   }
 
   return (
@@ -111,18 +173,30 @@ export default function Courses() {
                       Remove Trainer
                     </button>
                   ) : (
-                    <div className="flex items-center space-x-2">
-                      <select className="border border-gray-300 px-4 py-2 rounded-lg shadow-md">
-                        <option value="">Select Trainer</option>
-                        {trainerList.map((trainer) => (
-                          <option key={trainer.id} value={trainer.id}>
-                            {trainer.name}
-                          </option>
-                        ))}
-                      </select>
-                      <button className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
-                        Assign Trainer
-                      </button>
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <select className="border border-gray-300 px-4 py-2 rounded-lg shadow-md" onChange={onChangeTrainer}>
+                          <option value="">Select Trainer</option>
+                          {formatTrainer(trainerList, { location: course.location, subject: course.subject }).map((trainer) => (
+                            <option key={trainer.id} value={`${course.id}-${trainer.id}`}>
+                              {trainer.name}
+                            </option>
+                          ))}
+                        </select>
+                        <button onClick={() => asignTrainer()} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
+                          Assign Trainer
+                        </button>
+                      </div>
+                      {success && (
+                        <div className="mb-2 font-semibold text-green-500 rounded-md w-full">
+                          {success && <div className="text-sm">{success}</div>}
+                        </div>
+                      )}
+                      {errors && (
+                        <div className="mb-2 font-semibold text-red-500 rounded-md w-full">
+                          {errors && <div className="text-sm">{errors}</div>}
+                        </div>
+                      )}
                     </div>
                   )}
                 </td>
