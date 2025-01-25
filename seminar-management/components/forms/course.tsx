@@ -27,7 +27,7 @@ const CourseForm = ({ courseList, setCourseList, setWhichNew, setSuccesss, setEr
             setSuccesss(undefined);
         });
     }
-    
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         startPending();
@@ -68,21 +68,20 @@ const CourseForm = ({ courseList, setCourseList, setWhichNew, setSuccesss, setEr
                         setCourseList(data);
                     });
                 } else {
-                    setErrors("Expected erreor");
+                    const error = await e.json();
+                    setErrors(error.errors.join(", "));
                 }
             })
-
-            wait(5000).then(() => {
-                setErrors(undefined);
-                setSuccesss(undefined);
-            });
         } catch (error) {
             setError();
             setErrors("Expected erreor");
         }
 
-        wait(5000)
-        resetStatus();
+        wait(5000).then(() => {
+            setErrors(undefined);
+            setSuccesss(undefined);
+            resetStatus();
+        });
     };
 
     return (
@@ -209,7 +208,7 @@ const CourseForm = ({ courseList, setCourseList, setWhichNew, setSuccesss, setEr
                 </div>
             </div>
             <div className="flex flex-2 justify-start my-3 space-x-4">
-                <button type="submit" disabled={status === 'pending'} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
+                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">
                     Register
                 </button>
                 <button type="reset" onClick={() => setWhichNew(undefined)} className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">

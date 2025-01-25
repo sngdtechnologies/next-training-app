@@ -3,6 +3,7 @@ import { Trainer } from "@/shared/models";
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ITrainer } from "@/shared/types/trainer.type";
 import { formatTrainer } from "@/formatter/trainers";
+import { VTrainer } from "@/validation/trainer";
 
 export default async function handler(
     req: NextApiRequest,
@@ -23,11 +24,17 @@ export default async function handler(
         case "POST":
             try {
                 const data: ITrainer = await req.body;
+                
+                await VTrainer.validate(data, { abortEarly: false });
+
                 const trainer = await Trainer.create({ ...data });
                 
                 res.status(201).json(formatTrainer(trainer));
             } catch (error) {
                 console.error(error);
+                if (error instanceof Error && error.name === 'ValidationError') {
+                    return res.status(400).json({ errors: (error as any).errors });
+                }
                 errorHandler(res, "Expected error", 500);
             }
             break;

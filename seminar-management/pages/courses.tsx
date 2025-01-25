@@ -96,7 +96,8 @@ export default function Courses() {
       if (e.ok) {
         setSuccesss("Trainer assigned successfully.");
       } else {
-        setErrors("Failed to assign trainer.");
+        const error = await e.json();
+        setErrors(error.errors.join(", "));
       }
     });
 
