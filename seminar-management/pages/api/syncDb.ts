@@ -5,6 +5,7 @@ import User from "@/shared/models/User";
 import { ITrainer } from "@/shared/types/trainer.type";
 import type { NextApiRequest, NextApiResponse } from 'next'
 import bcrypt from "bcrypt";
+import { Sequelize } from "sequelize";
 
 export default async function handler(
     req: NextApiRequest,
@@ -13,6 +14,23 @@ export default async function handler(
     if (req.method !== "POST") {
         return errorHandler(res, "Method Not Allowed", 405);
     }
+
+    (async () => {
+        const sequelize = new Sequelize(`mysql://${process.env.MYSQL_USER || ''}:${process.env.MYSQL_PASSWORD}@localhost:3306`, {
+            logging: false,
+        });
+
+        try {
+            const dbName = 'training';
+
+            await sequelize.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\`;`);
+            console.log(`Database "${dbName}" created successfully!`);
+        } catch (error) {
+            console.error('Error creating database:', error);
+        } finally {
+            await sequelize.close();
+        }
+    })();
 
     try {
         await sequelize.sync({ force: true });
