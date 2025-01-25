@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.2",
+    "@types/nodemailer": "^6.4.17",
     "autoprefixer": "^10.4.20",
     "bcrypt": "^5.1.1",
     "dayjs": "^1.11.13",
